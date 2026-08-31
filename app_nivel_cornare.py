@@ -20,8 +20,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Coordenadas por defecto (Institución Universitaria Pascual Bravo)
 # Se usan solo si la API no trae la latitud/longitud de la estación.
 # ------------------------------------------------------------------
-LAT_DEFECTO = 6.2766
-LON_DEFECTO = -75.5901
+LAT_DEFECTO = 6.2942
+LON_DEFECTO = -75.06251
 
 API_BASE_URL = "https://marco.cornare.gov.co/api/v1/estaciones"
 
@@ -114,14 +114,13 @@ def calcular_indice_calidad(df):
 # Sidebar — parámetros de la consulta (editables por cada estudiante)
 # ------------------------------------------------------------------
 st.sidebar.header("Parámetros de tu consulta")
-nombre_estudiante = st.sidebar.text_input("Nombre del estudiante", "Tu Nombre Aquí")
-codigo_estacion = st.sidebar.text_input("Código de estación", "42")
-fecha_desde = st.sidebar.date_input("Desde", pd.to_datetime("2026-08-23")).strftime("%Y-%m-%d")
-fecha_hasta = st.sidebar.date_input("Hasta", pd.to_datetime("2026-08-30")).strftime("%Y-%m-%d")
+nombre_estudiante = st.sidebar.text_input("Nombre del estudiante", "Julián Ardila Castrillón")
+codigo_estacion = st.sidebar.text_input("Código de estación", "49")
+fecha_desde = st.sidebar.date_input("Desde", pd.to_datetime("2026-06-26")).strftime("%Y-%m-%d")
+fecha_hasta = st.sidebar.date_input("Hasta", pd.to_datetime("2026-07-02")).strftime("%Y-%m-%d")
 calidad = st.sidebar.selectbox("Calidad", [1, 0], index=0, help="1 = solo datos validados")
-consultar = st.sidebar.button("🔍 Consultar", type="primary")
 
-st.title("🌊 Nivel de ríos y quebradas — CORNARE")
+st.title("🌊 Nivel de ríos y quebradas (San Rafael, Rio Guatapé, Vereda El Bizcocho) — CORNARE")
 st.caption(f"Estudiante: **{nombre_estudiante}** · Estación: **{codigo_estacion}**")
 
 # ------------------------------------------------------------------
