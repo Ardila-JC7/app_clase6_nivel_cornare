@@ -126,7 +126,7 @@ st.caption(f"Estudiante: **{nombre_estudiante}** · Estación: **{codigo_estacio
 # ------------------------------------------------------------------
 # Consulta y procesamiento
 # ------------------------------------------------------------------
-if consultar:
+if true:
     with st.spinner("Consultando la API..."):
         datos_crudos, error = obtener_serie_nivel(codigo_estacion, fecha_desde, fecha_hasta, calidad)
 
