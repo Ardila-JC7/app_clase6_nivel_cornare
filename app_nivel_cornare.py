@@ -188,11 +188,13 @@ else:
         # --- Imágenes de la estación ---
         st.subheader("Imágenes de la estación")
         st.caption("Reemplaza las rutas de abajo por tus propios archivos (por ejemplo, guárdalos en una carpeta `imagenes/` dentro del repositorio).")
-        col_img1, col_img2 = st.columns(2)
+        col_img1, col_img2, col_img3 = st.columns(3)
         with col_img1:
             mostrar_imagen_segura("imagenes/estacion_1.jpg", "Estación de nivel — Vista 1")
         with col_img2:
             mostrar_imagen_segura("imagenes/estacion_2.jpg", "Estación de nivel — Vista 2")
+        with col_img3:
+            mostrar_imagen_segura("imagenes/estacion_3.jpg", "Estación de nivel — Vista 3")    
  
         # --- Detalle de calidad ---
         with st.expander("Detalle del índice de calidad"):
