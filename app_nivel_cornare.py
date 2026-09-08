@@ -12,6 +12,7 @@ import requests
 import pandas as pd
 import numpy as np
 import streamlit as st
+import altair as alt
 import urllib3
  
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -33,12 +34,19 @@ CANDIDATOS_LON = ["lng", "lon", "longitude", "longitud"]
 # ------------------------------------------------------------------
 # Parámetros de la consulta — YA NO SON EDITABLES POR EL USUARIO.
 # Antes eran cajas de texto/fecha en el sidebar; ahora son valores fijos.
+# Si necesitas cambiar la estación o el rango de fechas, edítalos aquí.
 # ------------------------------------------------------------------
 NOMBRE_ESTUDIANTE = "Julián Ardila Castrillón"
 CODIGO_ESTACION = "49"
 FECHA_DESDE = "2026-06-26"
 FECHA_HASTA = "2026-07-02"
 CALIDAD = 1  # 1 = solo datos validados, 0 = todos
+ 
+# Umbrales de alerta para la gráfica de nivel (EJEMPLO — reemplaza por los
+# valores reales de tu estación, visibles en la página de marco.cornare.gov.co)
+NIVEL_ALERTA_AMARILLA = 1.5
+NIVEL_ALERTA_NARANJA = 2.0
+NIVEL_ALERTA_ROJA = 2.5
  
 st.set_page_config(page_title="Nivel de estación — CORNARE", page_icon="🌊", layout="wide")
  
@@ -131,7 +139,7 @@ def mostrar_imagen_segura(ruta, caption):
 # ------------------------------------------------------------------
 # Sidebar — parámetros de la consulta (fijos, ya no editables)
 # ------------------------------------------------------------------
-st.sidebar.header("🔍 Parámetros de tu consulta")
+st.sidebar.header("Parámetros de tu consulta")
 st.sidebar.text_input("Nombre del estudiante", NOMBRE_ESTUDIANTE, disabled=True)
 st.sidebar.text_input("Código de estación", CODIGO_ESTACION, disabled=True)
 st.sidebar.date_input("Desde", pd.to_datetime(FECHA_DESDE), disabled=True)
@@ -175,9 +183,35 @@ else:
         col3.metric("Índice de calidad", f"{indice_calidad} / 100")
         col4.metric("Outliers detectados", n_outliers)
  
-        # --- Gráfico: Nivel corriente de agua ---
+        # --- Gráfico: Nivel corriente de agua (con umbrales de alerta) ---
         st.subheader("Nivel corriente de agua")
-        st.line_chart(df.set_index("fecha")["nivel"])
+ 
+        linea_nivel = (
+            alt.Chart(df)
+            .mark_line(color="#1f77b4")
+            .encode(x=alt.X("fecha:T", title="Fecha"), y=alt.Y("nivel:Q", title="Nivel"))
+        )
+ 
+        umbrales = pd.DataFrame(
+            {
+                "nivel": [NIVEL_ALERTA_AMARILLA, NIVEL_ALERTA_NARANJA, NIVEL_ALERTA_ROJA],
+                "alerta": ["Alerta amarilla", "Alerta naranja", "Alerta roja"],
+                "color": ["#f1c40f", "#e67e22", "#e74c3c"],
+            }
+        )
+        lineas_umbral = (
+            alt.Chart(umbrales)
+            .mark_rule(strokeDash=[6, 3], strokeWidth=2)
+            .encode(y="nivel:Q", color=alt.Color("color:N", scale=None), tooltip=["alerta", "nivel"])
+        )
+ 
+        st.altair_chart((linea_nivel + lineas_umbral).interactive(), use_container_width=True)
+        st.caption(
+            f"🟡 Alerta amarilla: {NIVEL_ALERTA_AMARILLA} · "
+            f"🟠 Alerta naranja: {NIVEL_ALERTA_NARANJA} · "
+            f"🔴 Alerta roja: {NIVEL_ALERTA_ROJA}  "
+            "(valores de ejemplo — reemplázalos por los reales de tu estación)"
+        )
  
         # --- Mapa de la estación ---
         st.subheader("Ubicación de la estación")
@@ -188,13 +222,11 @@ else:
         # --- Imágenes de la estación ---
         st.subheader("Imágenes de la estación")
         st.caption("Reemplaza las rutas de abajo por tus propios archivos (por ejemplo, guárdalos en una carpeta `imagenes/` dentro del repositorio).")
-        col_img1, col_img2, col_img3 = st.columns(3)
+        col_img1, col_img2 = st.columns(2)
         with col_img1:
             mostrar_imagen_segura("imagenes/estacion_1.jpg", "Estación de nivel — Vista 1")
         with col_img2:
             mostrar_imagen_segura("imagenes/estacion_2.jpg", "Estación de nivel — Vista 2")
-        with col_img3:
-            mostrar_imagen_segura("imagenes/estacion_3.jpg", "Estación de nivel — Vista 3")    
  
         # --- Detalle de calidad ---
         with st.expander("Detalle del índice de calidad"):
