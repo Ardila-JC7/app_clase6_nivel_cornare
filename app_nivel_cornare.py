@@ -31,7 +31,7 @@ CANDIDATOS_LAT = ["lat", "latitude", "latitud"]
 CANDIDATOS_LON = ["lng", "lon", "longitude", "longitud"]
  
 # ------------------------------------------------------------------
-# Parámetros de la consulta.
+# Parámetros de la consulta — YA NO SON EDITABLES POR EL USUARIO.
 # Antes eran cajas de texto/fecha en el sidebar; ahora son valores fijos.
 # ------------------------------------------------------------------
 NOMBRE_ESTUDIANTE = "Julián Ardila Castrillón"
@@ -132,11 +132,15 @@ def mostrar_imagen_segura(ruta, caption):
 # Sidebar — parámetros de la consulta (fijos, ya no editables)
 # ------------------------------------------------------------------
 st.sidebar.header("🔍 Parámetros de tu consulta")
-st.sidebar.markdown(f"**Nombre del estudiante:** {NOMBRE_ESTUDIANTE}")
-st.sidebar.markdown(f"**Código de estación:** {CODIGO_ESTACION}")
-st.sidebar.markdown(f"**Desde:** {FECHA_DESDE}")
-st.sidebar.markdown(f"**Hasta:** {FECHA_HASTA}")
-st.sidebar.markdown(f"**Calidad:** {'Solo datos validados' if CALIDAD == 1 else 'Todos los datos'}")
+st.sidebar.text_input("Nombre del estudiante", NOMBRE_ESTUDIANTE, disabled=True)
+st.sidebar.text_input("Código de estación", CODIGO_ESTACION, disabled=True)
+st.sidebar.date_input("Desde", pd.to_datetime(FECHA_DESDE), disabled=True)
+st.sidebar.date_input("Hasta", pd.to_datetime(FECHA_HASTA), disabled=True)
+st.sidebar.selectbox(
+    "Calidad",
+    ["Solo datos validados" if CALIDAD == 1 else "Todos los datos"],
+    disabled=True,
+)
  
 st.title("🌊 Nivel de ríos y quebradas (San Rafael, Rio Guatapé, Vereda El Bizcocho) — CORNARE")
 st.caption(f"Estudiante: **{NOMBRE_ESTUDIANTE}** · Estación: **{CODIGO_ESTACION}**")
@@ -184,13 +188,11 @@ else:
         # --- Imágenes de la estación ---
         st.subheader("Imágenes de la estación")
         st.caption("Reemplaza las rutas de abajo por tus propios archivos (por ejemplo, guárdalos en una carpeta `imagenes/` dentro del repositorio).")
-        col_img1, col_img2, col_img3 = st.columns(3)
+        col_img1, col_img2 = st.columns(2)
         with col_img1:
             mostrar_imagen_segura("imagenes/estacion_1.jpg", "Estación de nivel — Vista 1")
         with col_img2:
             mostrar_imagen_segura("imagenes/estacion_2.jpg", "Estación de nivel — Vista 2")
-        with col_img3:
-            mostrar_imagen_segura("imagenes/estacion_3.jpg", "Estación de nivel - Vista 3")
  
         # --- Detalle de calidad ---
         with st.expander("Detalle del índice de calidad"):
