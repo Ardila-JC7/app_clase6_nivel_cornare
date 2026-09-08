@@ -48,6 +48,8 @@ NIVEL_ALERTA_ROJA = 429
 
 # ---------------------------------------------------------------
 # Perfil del cauce (ancho vs. elevación del lecho, en cm)
+# IMPORTANTE: estos puntos son un perfil ILUSTRATIVO, aproximado a partir
+# de la gráfica de referencia.
 # ---------------------------------------------------------------
 PERFIL_CAUCE = pd.DataFrame(
     {
@@ -177,11 +179,20 @@ def graficar_seccion_cauce(nivel_actual, perfil=PERFIL_CAUCE,
     zonas = pd.DataFrame(
         {
             "zona_x": ["Nivel", "Nivel", "Nivel", "Nivel"],
+            "zona": ["Segura", "Amarilla", "Naranja", "Roja"],
+            "rango": [
+                f"< {umbral_amarilla} cm",
+                f"{umbral_amarilla} – {umbral_naranja} cm",
+                f"{umbral_naranja} – {umbral_roja} cm",
+                f"≥ {umbral_roja} cm",
+            ],
             "y0": [0, umbral_amarilla, umbral_naranja, umbral_roja],
             "y1": [umbral_amarilla, umbral_naranja, umbral_roja, umbral_roja + 100],
             "color": ["#2ecc71", "#f1c40f", "#e67e22", "#e74c3c"],
         }
     )
+    zonas["y_medio"] = (zonas["y0"] + zonas["y1"]) / 2
+
     barra = (
         alt.Chart(zonas)
         .mark_bar(size=40)
@@ -190,14 +201,25 @@ def graficar_seccion_cauce(nivel_actual, perfil=PERFIL_CAUCE,
             y=alt.Y("y0:Q", title=None, scale=alt.Scale(domain=[0, umbral_roja + 100])),
             y2="y1:Q",
             color=alt.Color("color:N", scale=None),
+            tooltip=[alt.Tooltip("zona:N", title="Zona"), alt.Tooltip("rango:N", title="Rango")],
         )
+    )
+    etiqueta_zona = (
+        alt.Chart(zonas)
+        .mark_text(align="left", dx=45, dy=-6, fontSize=11, fontWeight="bold")
+        .encode(x="zona_x:N", y="y_medio:Q", text="zona:N")
+    )
+    etiqueta_rango = (
+        alt.Chart(zonas)
+        .mark_text(align="left", dx=45, dy=8, fontSize=9, color="gray")
+        .encode(x="zona_x:N", y="y_medio:Q", text="rango:N")
     )
     marcador = (
         alt.Chart(pd.DataFrame({"nivel": [nivel_actual], "zona_x": ["Nivel"]}))
         .mark_point(shape="triangle-left", size=250, color="black")
         .encode(x="zona_x:N", y="nivel:Q")
     )
-    barra_chart = (barra + marcador).properties(width=80, height=350)
+    barra_chart = (barra + marcador + etiqueta_zona + etiqueta_rango).properties(width=170, height=350)
 
     return alt.hconcat(perfil_chart, barra_chart)
 
@@ -283,18 +305,18 @@ else:
         st.altair_chart(graficar_seccion_cauce(nivel_actual), use_container_width=False)
         st.caption(
             f"Nivel actual: {nivel_actual:.1f} cm · Último registro: {df['fecha'].iloc[-1].strftime('%d/%m/%Y %H:%M')} · "
-            "El perfil del cauce (área café) es ilustrativo."
+            "El perfil del cauce (área café) es ilustrativo — reemplázalo por los datos reales si los consigues."
         )
 
         # --- Mapa de la estación ---
         st.subheader("🗺️ Ubicación de la estación")
         if not coords_reales:
-            st.caption("La API no trajo latitud/longitud de la estación — se muestra el punto de partida por defecto de esta estación (San Rafael). Ajusta `CANDIDATOS_LAT` / `CANDIDATOS_LON` si conoces el nombre real de esas llaves.")
+            st.caption("Conoce el punto exacto en el mapa de la estación.")
         st.map(pd.DataFrame({"lat": [lat], "lon": [lon]}), zoom=10)
 
         # --- Imágenes de la estación ---
         st.subheader("📸 Imágenes de la estación")
-        st.caption("Reemplaza las rutas de abajo por tus propios archivos (por ejemplo, guárdalos en una carpeta `imagenes/` dentro del repositorio).")
+        st.caption("Conoce un poco la estación.")
         col_img1, col_img2, col_img3 = st.columns(3)
         with col_img1:
             mostrar_imagen_segura("imagenes/estacion_1.jpg", "Estación de nivel — Vista 1")
