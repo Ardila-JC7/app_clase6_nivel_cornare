@@ -42,11 +42,10 @@ FECHA_DESDE = "2026-06-26"
 FECHA_HASTA = "2026-07-02"
 CALIDAD = 1  # 1 = solo datos validados, 0 = todos
  
-# Umbrales de alerta para la gráfica de nivel (EJEMPLO — reemplaza por los
-# valores reales de tu estación, visibles en la página de marco.cornare.gov.co)
-NIVEL_ALERTA_AMARILLA = 1.5
-NIVEL_ALERTA_NARANJA = 2.0
-NIVEL_ALERTA_ROJA = 2.5
+# Umbrales de alerta para la gráfica de nivel (estación San Rafael - código 49)
+NIVEL_ALERTA_AMARILLA = 343
+NIVEL_ALERTA_NARANJA = 367
+NIVEL_ALERTA_ROJA = 430
  
 st.set_page_config(page_title="Nivel de estación — CORNARE", page_icon="🌊", layout="wide")
  
@@ -209,8 +208,7 @@ else:
         st.caption(
             f"🟡 Alerta amarilla: {NIVEL_ALERTA_AMARILLA} · "
             f"🟠 Alerta naranja: {NIVEL_ALERTA_NARANJA} · "
-            f"🔴 Alerta roja: {NIVEL_ALERTA_ROJA}  "
-            "(valores de ejemplo — reemplázalos por los reales de tu estación)"
+            f"🔴 Alerta roja: {NIVEL_ALERTA_ROJA}"
         )
  
         # --- Mapa de la estación ---
