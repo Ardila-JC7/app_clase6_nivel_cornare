@@ -305,7 +305,7 @@ else:
         st.altair_chart(graficar_seccion_cauce(nivel_actual), use_container_width=False)
         st.caption(
             f"Nivel actual: {nivel_actual:.1f} cm · Último registro: {df['fecha'].iloc[-1].strftime('%d/%m/%Y %H:%M')} · "
-            "El perfil del cauce (área café) es ilustrativo — reemplázalo por los datos reales si los consigues."
+            "El perfil del cauce (área café) es ilustrativo."
         )
 
         # --- Mapa de la estación ---
